@@ -152,6 +152,7 @@ class AllRespository {
     }));
     var count = 1;
     var futures = <Future>[];
+    String b="c";
 
     for (var urlImage in urlImages) {
       var nameImage = checkNameUrl(urlImage, count);
