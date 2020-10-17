@@ -10,4 +10,5 @@ abstract class Routes{
   static const INFO = '/info';
   static const CHAPTER = '/chapter';
   static const READ = '/read';
+  static const MANHUA = '/manhua';
 }

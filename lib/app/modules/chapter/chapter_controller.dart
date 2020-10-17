@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:manager_v2/app/modules/comic/model/chapter_model.dart';
-import 'package:manager_v2/app/modules/comic/model/comic_search_model.dart';
 import 'package:manager_v2/app/modules/comic/model/comics_model.dart';
 import 'package:manager_v2/app/modules/comic/model/page_model.dart';
 import 'package:manager_v2/app/modules/info/model/comic_info_model.dart';
@@ -10,10 +9,13 @@ import 'package:manager_v2/app/routes/app_pages.dart';
 
 class ChaptersViewModel {
   String name;
-  bool isDownloaded = false;
+  double downloadCurrentValue;
+  var isDownload = DownloadEnum.None.obs;
 
   ChaptersViewModel({this.name});
 }
+
+enum DownloadEnum { None, Downloading, Completed, Error }
 
 class ChapterController extends GetxController {
   final AllRespository respository;
@@ -21,7 +23,7 @@ class ChapterController extends GetxController {
   ChapterController({@required this.respository});
 
   var chapters = List<ChapterModel>();
-  var chaptersView = List<ChaptersViewModel>().obs;
+  RxList<ChaptersViewModel> chaptersView = List<ChaptersViewModel>().obs;
   var currentChapter;
 
   ComicsModel comicsFi;
@@ -29,13 +31,16 @@ class ChapterController extends GetxController {
   ComicInfoModel comicOnlyInfo;
 
   loadingChapter(ComicInfoModel comic, ComicsModel comicsFi) async {
+    respository.count++;
+
+    printInfo(info: '${respository.count++} in chapter');
     this.comicsFi = comicsFi;
     this.comicOnlyInfo = comic;
 
     chapters = await respository.getChapterFromUrl(comic.url);
     chaptersView.clear();
     for (var chapterv in chapters) {
-      chaptersView.value.add(ChaptersViewModel(name: chapterv.name));
+      chaptersView.add(ChaptersViewModel(name: chapterv.name));
     }
 
     if (comicsFi == null) return;
@@ -47,15 +52,18 @@ class ChapterController extends GetxController {
     comicFinded = comicsFi.comics[indexComicFinded];
     //Liet ke cac chapter hien ra
     for (var chapter in comicFinded.chapters) {
-      int index = chaptersView.value
-          .indexWhere((element) => element.name == chapter.name);
+      int index =
+          chaptersView.indexWhere((element) => element.name == chapter.name);
       if (index != -1) {
-        chaptersView[index].isDownloaded = true;
+        chaptersView[index].isDownload(DownloadEnum.Completed);
       }
     }
   }
 
   downloadChapter(int index) async {
+    chaptersView[index].isDownload(DownloadEnum.Downloading);
+    chaptersView[index].downloadCurrentValue = 0;
+    chaptersView.refresh();
     if (comicsFi == null) {
       //add Comic to comicsFi
       comicsFi = ComicsModel();
@@ -71,28 +79,42 @@ class ChapterController extends GetxController {
       comicFinded = comicOnlyInfo;
       comicFinded.id = comicFinded.hashCode;
       comicFinded.chapters = List<ChapterModel>();
-    } else {
-      int indexChapterHas = comicFinded.chapters
-          .indexWhere((element) => element.name == chapters[index].name);
     }
 
     chapters[index].pages = List<PageModel>();
+    int countPage = 0;
     //thuc hien download chapter trong nay
-    await respository.downloadChapter(chapters[index], (PageModel value) {
-      chapters[index].pages.add(value);
-      chaptersView[index].isDownloaded = true;
+    await respository.downloadChapter(chapters[index],
+        (PageModel value, int maxPage) {
+      if (value == null) {
+        //xoa chapter download loi
+        chaptersView[index].isDownload(DownloadEnum.Error);
+        chapters[index].pages.clear();
+        chaptersView[index].downloadCurrentValue = 0;
+        chaptersView.refresh();
+        printInfo(info: 'Download bi loi Khong download duoc');
+        Get.defaultDialog(title: "${chaptersView[index].name} bi loi");
+      } else {
+        chapters[index].pages.add(value);
+
+        chaptersView[index].downloadCurrentValue =
+            num.parse((countPage / maxPage).toStringAsFixed(1));
+        chaptersView.refresh();
+        countPage++;
+      }
     });
-    chapters[index].pages.sort((a,b)=>a.index.compareTo(b.index));
+    if (chaptersView[index].isDownload.value == DownloadEnum.Error) {
+      comicFinded.chapters
+          .removeWhere((element) => element.name == chapters[index].name);
+      return;
+    }
+    chapters[index].pages.sort((a, b) => a.index.compareTo(b.index));
+    chaptersView[index].isDownload(DownloadEnum.Completed);
+    chaptersView.refresh();
+    Get.snackbar(
+        'Download Info', 'Download thanh cong ${chaptersView[index].name}');
     printInfo(info: 'Download xong chapter ${chapters[index].name}');
-    // int indexChapterHas = comicFinded.chapters.indexWhere((element) => element.name == chapters[index].name);
-    // if(indexChapterHas == -1)
-    //   comicFinded.chapters.add(chapters[index]);
-    // else
-    //   {
-    //     //xoa file
-    //     comicFinded.chapters.removeAt(indexChapterHas);
-    //     comicFinded.chapters.add(chapters[index]);
-    //   }
+
     comicFinded.chapters
         .removeWhere((element) => element.name == chapters[index].name);
     comicFinded.chapters.add(chapters[index]);
@@ -107,7 +129,9 @@ class ChapterController extends GetxController {
   }
 
   toReadPage(int index) {
-    var indexCurrent = comicFinded.chapters.indexWhere((element) => element.name == chaptersView[index].name);
+    var indexCurrent = comicFinded.chapters
+        .indexWhere((element) => element.name == chaptersView[index].name);
+    printInfo(info: '${chaptersView[index].name}');
 
     currentChapter = comicFinded.chapters[indexCurrent];
     Get.toNamed(Routes.READ);

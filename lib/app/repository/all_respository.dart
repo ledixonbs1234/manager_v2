@@ -14,7 +14,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:connectivity/connectivity.dart';
 
 class AllRespository {
+  //Global value
+  int count = 0;
   final Dio _dio = Dio();
+  ComicsModel comicsModel;
 
   Future<bool> isNetwork() async {
     var connectResult = await Connectivity().checkConnectivity();
@@ -28,7 +31,7 @@ class AllRespository {
     //Thuc hien lenh trong nay
     var textCross = text.replaceAll(' ', '+');
     var urlPrepage =
-        'http://www.nettruyen.com/Comic/Services/SuggestSearch.ashx?q=';
+        'https://www.nettruyen.com/Comic/Services/SuggestSearch.ashx?q=';
     var url = urlPrepage + textCross;
 
     var document = await getDocumentWeb(url);
@@ -43,7 +46,7 @@ class AllRespository {
     var comics = List<ComicSearchModel>();
     elements.forEach((element) {
       String name = element.getElementsByTagName('h3')[0].text;
-      var imageUrl = 'http://' +
+      var imageUrl = 'https://' +
           element
               .getElementsByTagName('img')[0]
               .attributes['src']
@@ -52,7 +55,7 @@ class AllRespository {
       var currentChapter = element.getElementsByTagName('i')[0].text;
       ComicSearchModel comic = ComicSearchModel(
           name: name,
-          url: url,
+          url: prefixUrl(url),
           imageUrl: imageUrl,
           currentChapter: currentChapter);
       comics.add(comic);
@@ -64,7 +67,7 @@ class AllRespository {
     final response = await _dio.getUri(Uri.parse(url));
 
     if (response.statusCode != 200) {
-      printError(info:"Loi mang ${response.statusCode}");
+      printError(info: "Loi mang ${response.statusCode}");
       return null;
     }
     return parse(response.data);
@@ -105,18 +108,18 @@ class AllRespository {
       return 'image' + count.toString() + '.jpg';
   }
 
-  Future<Directory> createFolderInManga(String name) async {
+  Future<Directory> getFolderComicInManga(String name) async {
     var pathManga = await getRealPathManga();
-    return await Directory('$pathManga/$name').create(recursive: true);
+    var folder = Directory('$pathManga/$name');
+    return folder.create(recursive: true);
   }
 
   Future<String> getRealPathManga() async {
     Directory folder = await getExternalStorageDirectory();
     var nameManga = 'Manga';
     var folderManga = Directory('${folder.path}/$nameManga');
-    bool isExist = await folderManga.exists();
     //Kiem tra su ton tai file
-    if (!isExist) await folderManga.create(recursive: true);
+    await folderManga.create(recursive: true);
     return folderManga.path;
   }
 
@@ -143,38 +146,49 @@ class AllRespository {
     await checkPermission();
 
     var urlImages = await getUrlImageFromUrlChapter(chapter.url);
-    String progress = "";
-    var folder = await createFolderInManga(chapter.nameComic);
+
+    var folder = await getFolderComicInManga(chapter.nameComic);
+    var folderChapter = await Directory('${folder.path}/${chapter.name}')
+        .create(recursive: true);
     var dio = Dio();
 
     dio.interceptors.add(InterceptorsWrapper(onRequest: (Options options) {
       options.headers['referer'] = 'nettruyen';
     }));
     var count = 1;
-    var futures = <Future>[];
-    String b="c";
+
+    bool isError = false;
 
     for (var urlImage in urlImages) {
       var nameImage = checkNameUrl(urlImage, count);
-      var urlRealPath = "${folder.path}/$nameImage";
+      var urlRealPath = "${folderChapter.path}/$nameImage";
       count++;
-      var page = PageModel(index:count,
-          name: nameImage, urlPath: urlImage, urlRealpath: urlRealPath);
+      var page = PageModel(
+          index: count,
+          name: nameImage,
+          urlPath: urlImage,
+          urlRealpath: urlRealPath);
 
       try {
-        futures.add(dio.download(
-          urlImage,
-          urlRealPath,
-          onReceiveProgress: (receibyte, totalByte) {
-            var progress = ((receibyte / totalByte) * 100);
-          },
-          queryParameters: {'referer':'http://www.nettruyen.com/'}
-        ).then((d) => callback(page)).catchError((e)=>Get.snackbar('title', 'Loi $e')));
+        await dio
+            .download(urlImage, urlRealPath,
+                onReceiveProgress: (receibyte, totalByte) {
+              var progress = ((receibyte / totalByte) * 100);
+            }, queryParameters: {'referer': 'http://www.nettruyen.com/'})
+            .then((d) => callback(page, urlImages.length))
+            .catchError((e) {
+              Get.snackbar('title', 'Loi $e ');
+              urlImage.printError();
+              isError = true;
+            });
       } catch (e) {
         Get.snackbar('tieu de', e.toString());
       }
+      if (isError) {
+        callback(null, null);
+        break;
+      }
     }
-    await Future.wait(futures);
   }
 
   Future<ComicInfoModel> getInfoComic(String urlComic) async {
@@ -184,7 +198,8 @@ class AllRespository {
         .getElementsByClassName('col-xs-4 col-image')[0]
         .getElementsByTagName('img')[0]
         .attributes['src'];
-    var urlImage = prefixUrl(rawUrlImage);
+    String urlImage = prefixUrl(rawUrlImage);
+    urlImage.printInfo();
     var name = document.getElementsByClassName('title-detail')[0].text;
     var author =
         document.getElementsByClassName('author row')[0].children.last.text;
@@ -231,13 +246,16 @@ class AllRespository {
     }
     Map<String, dynamic> dataJson = jsonDecode(contentJson);
     var comics = ComicsModel.fromJson(dataJson);
+    comicsModel = comics;
+
     return comics;
   }
 
-  deleteFileJson()async{
+  deleteFileJson() async {
     var nameFile = 'listComicManga.json';
     var pathFolder = await getRealPathManga();
     File('$pathFolder/$nameFile').delete(recursive: true);
+    File(pathFolder).delete(recursive: true);
   }
 
   Future<String> _getContentFile(String pathFolder, String nameFile) async {
@@ -251,21 +269,24 @@ class AllRespository {
     }
   }
 
-  Future<bool> saveComicToFile(Map<String,dynamic> jsonObject) async{
+  Future<bool> saveComicToFile(Map<String, dynamic> jsonObject) async {
     var nameFile = 'listComicManga.json';
     var pathFolder = await getRealPathManga();
-    var isWrited = await  writeTextToFile(pathFolder, nameFile, jsonEncode(jsonObject));
-    if(isWrited){
+    var isWrited =
+        await writeTextToFile(pathFolder, nameFile, jsonEncode(jsonObject));
+    if (isWrited) {
       return true;
     }
     return false;
-
   }
- Future<bool> writeTextToFile(String pathFolder,String filename,String content)async{
-    try{
-      await File('$pathFolder/$filename').writeAsString(content,mode: FileMode.write);
+
+  Future<bool> writeTextToFile(
+      String pathFolder, String filename, String content) async {
+    try {
+      await File('$pathFolder/$filename')
+          .writeAsString(content, mode: FileMode.write);
       return true;
-    }catch(e){
+    } catch (e) {
       return false;
     }
   }

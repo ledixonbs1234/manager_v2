@@ -15,12 +15,14 @@ class InfoController extends GetxController {
   ComicsModel comicsFi;
 
   infoLoading(String urlComic) async {
+    respository.count++;
+    printInfo(info: '${respository.count} in info');
     var network = await respository.isNetwork();
-    comicsFi = await respository.getComicsFromJson();
+    comicsFi = respository.comicsModel;
     if (network) {
       //Co mang
       //Thuc hien lay thong tin comic
-      comic.value = await respository.getInfoComic(urlComic);
+      comic(await respository.getInfoComic(urlComic));
       printInfo(info: 'Da update xong comic');
     } else {
       //Rot mang
@@ -36,9 +38,8 @@ class InfoController extends GetxController {
     Get.toNamed(Routes.CHAPTER);
   }
 
-   deleteFile() {
+  deleteFile() {
     comicsFi = null;
     respository.deleteFileJson();
-
-   }
+  }
 }

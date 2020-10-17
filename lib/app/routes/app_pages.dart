@@ -1,3 +1,5 @@
+import 'package:manager_v2/app/modules/manhua/views/manhua_view.dart';
+import 'package:manager_v2/app/modules/manhua/bindings/manhua_binding.dart';
 import 'package:manager_v2/app/modules/read/read_view.dart';
 import 'package:manager_v2/app/modules/read/read_binding.dart';
 import 'package:manager_v2/app/modules/chapter/chapter_view.dart';
@@ -49,6 +51,11 @@ static const INITIAL = Routes.HOME;
       name: Routes.READ, 
       page:()=> ReadView(), 
       binding: ReadBinding(),
+    ),
+    GetPage(
+      name: Routes.MANHUA, 
+      page:()=> ManhuaView(), 
+      binding: ManhuaBinding(),
     ),
   ];
 }

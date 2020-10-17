@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
    <application
+       android:usesCleartextTraffic="true"
         android:label="manager_v2"
         android:icon="@mipmap/ic_launcher">
         <activity

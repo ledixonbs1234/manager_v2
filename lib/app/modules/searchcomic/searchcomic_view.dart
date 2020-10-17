@@ -1,21 +1,20 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:manager_v2/app/modules/comic/comic_controller.dart';
 import 'package:manager_v2/app/modules/searchcomic/searchcomic_controller.dart';
 
-class SearchcomicView extends GetView<SearchcomicController> {
+class SearchcomicView extends GetView<SearchcomicController>{
   @override
   Widget build(_) {
-    controller.text = Get.find<ComicController>().text;
-    controller.searchComic(controller.text);
     return Scaffold(
       appBar: AppBar(
         title: Text('SearchcomicView'),
         centerTitle: true,
       ),
-      body: Obx(() => controller.comicsFinded.length == 0
-          ? CircularProgressIndicator()
+      body: Obx(() => controller.comicsFinded.length ==0
+          ? Center(child: CircularProgressIndicator())
           : ListView.builder(
               itemCount: controller.comicsFinded.length,
               itemBuilder: (BuildContext _, int index) {

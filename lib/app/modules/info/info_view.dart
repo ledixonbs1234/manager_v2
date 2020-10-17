@@ -6,7 +6,7 @@ import 'package:manager_v2/app/modules/searchcomic/searchcomic_controller.dart';
 class InfoView extends GetView<InfoController> {
   @override
   Widget build(BuildContext context) {
-    controller.infoLoading(Get.find<SearchcomicController>().urlComic);
+
 
     return Scaffold(
       appBar: AppBar(
