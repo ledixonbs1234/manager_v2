@@ -17,7 +17,7 @@ class ComicController extends GetxController {
   ComicController({@required this.respository});
 
   loadingPage() async {
-    printInfo(info: '${respository.count++} in comic');
+
     //thuc hien get truyen
     comicsFinded(await respository.getComicsFromJson());
     if (comicsFinded == null) {}

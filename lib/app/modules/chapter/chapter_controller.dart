@@ -121,6 +121,8 @@ class ChapterController extends GetxController {
 
     comicsFi.comics.removeWhere((element) => element.name == comicFinded.name);
     comicsFi.comics.add(comicFinded);
+    //update respository
+    respository.comicsModel = comicsFi;
 
     //save comic to file
     var jsonOject = comicsFi.toJson();
