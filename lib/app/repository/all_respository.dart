@@ -9,6 +9,7 @@ import 'package:manager_v2/app/modules/comic/model/comic_search_model.dart';
 import 'package:manager_v2/app/modules/comic/model/comics_model.dart';
 import 'package:manager_v2/app/modules/comic/model/page_model.dart';
 import 'package:manager_v2/app/modules/info/model/comic_info_model.dart';
+import 'package:manager_v2/app/tool.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:connectivity/connectivity.dart';
@@ -17,7 +18,6 @@ class AllRespository {
   //Global value
   int count = 0;
   final Dio _dio = Dio();
-  ComicsModel comicsModel;
 
   Future<bool> isNetwork() async {
     var connectResult = await Connectivity().checkConnectivity();
@@ -64,7 +64,7 @@ class AllRespository {
   }
 
   Future<Document> getDocumentWeb(String url) async {
-    final response = await _dio.getUri(Uri.parse(url));
+    var response = await _dio.getUri(Uri.parse(url));
 
     if (response.statusCode != 200) {
       printError(info: "Loi mang ${response.statusCode}");
@@ -76,21 +76,33 @@ class AllRespository {
   Future<List<ChapterModel>> getChapterFromUrl(String url) async {
     Document document = await getDocumentWeb(url);
     if (document == null) return null;
-    var chaptersDo = document.getElementsByClassName('chapter');
+    var listChapter = document.getElementById('nt_listchapter');
+    var listChapterItem = listChapter.getElementsByTagName('li');
+    //xoa tai vi tri 0
+    listChapterItem.removeAt(0);
+
     var chapters = List<ChapterModel>();
     var nameComic = document.getElementsByClassName('title-detail')[0].text;
-    chaptersDo.forEach((element) {
-      var child = element.getElementsByTagName('a')[0];
+    for (var chapterss in listChapterItem) {
+      var chaptersDo = chapterss.getElementsByClassName('chapter').first;
+      var child = chaptersDo.getElementsByTagName('a').first;
       String nameChapter = child.text;
       String urlChapter = child.attributes['href'];
-      //var date = child.nextElementSibling;
+      var date = chapterss
+          .getElementsByClassName('col-xs-4 text-center small')
+          .first
+          .text;
+      var luotXemChapter = chapterss
+          .getElementsByClassName('col-xs-3 text-center small')
+          .first
+          .text;
       ChapterModel chapter = ChapterModel(
-          name: nameChapter,
-          url: urlChapter,
-          date: 'nothing',
-          nameComic: nameComic);
+          name: nameChapter, url: urlChapter, date: date, nameComic: nameComic,luotXem: luotXemChapter);
       chapters.add(chapter);
-    });
+    }
+
+    //var date = child.nextElementSibling;
+
     return chapters;
   }
 
@@ -153,9 +165,11 @@ class AllRespository {
     var dio = Dio();
 
     dio.interceptors.add(InterceptorsWrapper(onRequest: (Options options) {
-      options.headers['referer'] = 'nettruyen';
+      options.headers['Referer'] = 'nettruyen';
+      options.headers['content-Type'] = 'image/jpg';
     }));
     var count = 1;
+    dio.options.headers['referer'] = 'nettruyen';
 
     bool isError = false;
 
@@ -173,7 +187,7 @@ class AllRespository {
         await dio
             .download(urlImage, urlRealPath,
                 onReceiveProgress: (receibyte, totalByte) {
-              var progress = ((receibyte / totalByte) * 100);
+              // var progress = ((receibyte / totalByte) * 100);
             }, queryParameters: {'referer': 'http://www.nettruyen.com/'})
             .then((d) => callback(page, urlImages.length))
             .catchError((e) {
@@ -246,7 +260,7 @@ class AllRespository {
     }
     Map<String, dynamic> dataJson = jsonDecode(contentJson);
     var comics = ComicsModel.fromJson(dataJson);
-    comicsModel = comics;
+    Glob().setComicsFile(comics);
 
     return comics;
   }

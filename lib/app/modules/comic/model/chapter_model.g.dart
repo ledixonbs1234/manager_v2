@@ -12,6 +12,7 @@ ChapterModel _$ChapterModelFromJson(Map<String, dynamic> json) {
     url: json['url'] as String,
     date: json['date'] as String,
     nameComic: json['nameComic'] as String,
+    luotXem: json['luotXem'] as String,
   )..pages = (json['pages'] as List)
       ?.map((e) =>
           e == null ? null : PageModel.fromJson(e as Map<String, dynamic>))
@@ -24,5 +25,6 @@ Map<String, dynamic> _$ChapterModelToJson(ChapterModel instance) =>
       'url': instance.url,
       'date': instance.date,
       'nameComic': instance.nameComic,
+      'luotXem': instance.luotXem,
       'pages': instance.pages,
     };

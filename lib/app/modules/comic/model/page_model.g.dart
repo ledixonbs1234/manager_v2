@@ -8,6 +8,7 @@ part of 'page_model.dart';
 
 PageModel _$PageModelFromJson(Map<String, dynamic> json) {
   return PageModel(
+    index: json['index'] as int,
     name: json['name'] as String,
     urlPath: json['urlPath'] as String,
     urlRealpath: json['urlRealpath'] as String,
@@ -16,6 +17,7 @@ PageModel _$PageModelFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$PageModelToJson(PageModel instance) => <String, dynamic>{
+      'index': instance.index,
       'name': instance.name,
       'urlPath': instance.urlPath,
       'urlRealpath': instance.urlRealpath,

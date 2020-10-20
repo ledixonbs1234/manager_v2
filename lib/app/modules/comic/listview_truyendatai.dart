@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +17,7 @@ class ListViewTruyenDaTai extends StatelessWidget {
     printInfo(info: 'ListViewTruyenDaTai Chay');
     return Container(
         width: Get.width,
-        height: 210,
+        height: 230,
         child: Obx(() => controller.comicsFinded.value.comics != null
             ? ListView.builder(
                 itemCount: controller.comicsFinded.value.comics.length,
@@ -49,8 +50,10 @@ class ListViewTruyenDaTai extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Text(
+                          AutoSizeText(
                               controller.comicsFinded.value.comics[index].name,
+                          minFontSize: 10,
+                          maxLines: 3,
                           style: GoogleFonts.muli(
                             fontSize: 15,
                             fontWeight: FontWeight.w600

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:manager_v2/app/modules/chapter/chapter_controller.dart';
 import 'package:manager_v2/app/modules/comic/model/comic_search_model.dart';
 import 'package:manager_v2/app/modules/comic/model/comics_model.dart';
 import 'package:manager_v2/app/modules/info/model/comic_info_model.dart';
 import 'package:manager_v2/app/repository/all_respository.dart';
 import 'package:manager_v2/app/routes/app_pages.dart';
+
+import '../../tool.dart';
 
 class InfoController extends GetxController {
   final AllRespository respository;
@@ -15,10 +18,8 @@ class InfoController extends GetxController {
   ComicsModel comicsFi;
 
   infoLoading(String urlComic) async {
-    respository.count++;
-    printInfo(info: '${respository.count} in info');
     var network = await respository.isNetwork();
-    comicsFi = respository.comicsModel;
+    comicsFi = Glob().getComicsFile();
     if (network) {
       //Co mang
       //Thuc hien lay thong tin comic
@@ -36,6 +37,9 @@ class InfoController extends GetxController {
 
   goChapterPage() {
     Get.toNamed(Routes.CHAPTER);
+    var chapterController = Get.find<ChapterController>();
+    chapterController.loadingChapter(
+        comic.value);
   }
 
   deleteFile() {

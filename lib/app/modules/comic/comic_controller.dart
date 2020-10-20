@@ -11,6 +11,7 @@ class ComicController extends GetxController {
   TextEditingController editTextC = TextEditingController();
   String text;
   var state = StateComic.None.obs;
+  var focusNode = FocusNode().obs;
 
   final AllRespository respository;
   var comicsFinded = ComicsModel().obs;
@@ -24,10 +25,13 @@ class ComicController extends GetxController {
   }
 
   goSearchPage(String text) {
+    focusNode.value.unfocus();
     printInfo(info: 'GoSearchPage Mehthod');
     Get.toNamed(Routes.SEARCHCOMIC);
     SearchcomicController searchController = Get.find();
-    searchController.state.value = StateSearch.Loading;
-    searchController.searchComic(text);
+    if(text != null) {
+      searchController.state.value = StateSearch.Loading;
+      searchController.searchComic(text);
+    }
   }
 }

@@ -12,6 +12,8 @@ enum StateSearch{
 class SearchcomicController extends GetxController {
   final AllRespository respository;
   var state = StateSearch.None.obs;
+  var requestFocusTextField = FocusNode().obs;
+  TextEditingController editTextC = TextEditingController();
 
   SearchcomicController({@required this.respository});
   String urlComic ;
