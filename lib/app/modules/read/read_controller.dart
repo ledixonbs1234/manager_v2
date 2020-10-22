@@ -19,7 +19,7 @@ class ReadController extends GetxController {
   loadingPage(ChapterModel chapterDownload, bool isDownloaded)async {
     chapter(chapterDownload);
     this.isDownloaded(isDownloaded);
-    pages.clear();
+    pages =List<PageModel>().obs;
     if (isDownloaded) {
       pages.value = chapterDownload.pages;
       isShow(true);

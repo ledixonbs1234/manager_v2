@@ -41,7 +41,7 @@ class ChapterController extends GetxController {
 
     comicFinded = getComicFromComicsFile();
     chapters = await respository.getChapterFromUrl(comicOnlyInfo.url);
-    if (comicsFile.comics != null)
+    if  (comicFinded!= null)
       chapters = mapChaptersFileToChapters(chapters, comicFinded);
     convertChaptersToChaptersView(comic.url);
   }
