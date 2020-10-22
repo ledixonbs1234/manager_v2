@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -5,7 +6,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:manager_v2/app/modules/info/info_controller.dart';
-import 'package:manager_v2/app/modules/searchcomic/searchcomic_controller.dart';
 
 class InfoView extends GetView<InfoController> {
   @override
@@ -23,7 +23,23 @@ class InfoView extends GetView<InfoController> {
                     expandedHeight: 300,
                     flexibleSpace: FlexibleSpaceBar(
                       centerTitle: true,
-                      title: Text(controller.comic.value.name),
+                      title: ColorizeAnimatedTextKit(
+                        text: [
+                          controller.comic.value.name,
+                        ],
+                        textStyle: GoogleFonts.aBeeZee(
+                          fontSize: 20,
+
+                        ),textAlign: TextAlign.start,
+                        repeatForever: true,
+                        speed: Duration(milliseconds: 200),
+                        colors: [
+                          Colors.purple,
+                          Colors.blue,
+                          Colors.yellow,
+                          Colors.red,
+                        ],
+                      ),
                       background: Image.network(
                         controller.comic.value.urlImage,
                         fit: BoxFit.cover,
@@ -46,19 +62,23 @@ class InfoView extends GetView<InfoController> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 80,
+                            height: 50,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              SizedBox(width: 50,),
+                              SizedBox(
+                                width: 50,
+                              ),
                               moduleRow(
                                 "Tac gia",
                                 controller.comic.value.tacgia,
                                 "Tinh trang",
                                 controller.comic.value.tinhTrang,
                               ),
-                              SizedBox(width: 50,),
+                              SizedBox(
+                                width: 50,
+                              ),
                               moduleRow(
                                   "Luot xem",
                                   controller.comic.value.luotXem,
@@ -132,7 +152,8 @@ class InfoView extends GetView<InfoController> {
         Text(
           title,
           style: GoogleFonts.roboto(color: Colors.black38),
-        )
+        ),
+        SizedBox(height: 20),
       ],
     );
   }
