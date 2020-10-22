@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:manager_v2/app/modules/chapter/chapter_controller.dart';
 import 'package:manager_v2/app/modules/comic/model/page_model.dart';
@@ -13,17 +14,60 @@ class ReadView extends GetView<ReadController> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('ReadView'),
+          title: Obx(() => Text(controller.chapter.value.name)),
           centerTitle: true,
         ),
-        floatingActionButton: FabCircularMenu(
-          children: [
-            IconButton(icon: Icon(Icons.one_k), onPressed: () {}),
-            IconButton(icon: Icon(Icons.ac_unit), onPressed: () {})
-          ],
+        floatingActionButton: Obx(
+          () => Visibility(
+            visible: controller.isShowFLoat.value,
+            child: FabCircularMenu(
+              fabOpenIcon: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+              fabCloseIcon: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+              onDisplayChange: (value) {
+                if (!value) {
+                  controller.isShowFLoat(false);
+                } else {
+                  controller.isShowFLoat(true);
+                }
+              },
+              alignment: Alignment.bottomLeft,
+              ringWidth: 80,
+              fabColor: Colors.black12,
+              key: controller.fabkey,
+              ringColor: Colors.blue.withOpacity(0.5),
+              children: [
+                IconButton(
+                    icon: FaIcon(
+                      FontAwesomeIcons.arrowRight,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {}),
+                IconButton(
+                    icon:
+                        FaIcon(FontAwesomeIcons.arrowLeft, color: Colors.white),
+                    onPressed: () {}),
+                IconButton(
+                    icon: FaIcon(FontAwesomeIcons.arrowCircleLeft,
+                        color: Colors.white),
+                    onPressed: () {})
+              ],
+            ),
+          ),
         ),
         body: GestureDetector(
-          onLongPress: () {},
+          onLongPress: () {
+            if (!controller.isShowFLoat.value) {
+              controller.isShowFLoat(true);
+            } else {
+              controller.isShowFLoat(false);
+            }
+          },
           child: Obx(() => !controller.isShow.value
               ? CircularProgressIndicator()
               : ListView(
