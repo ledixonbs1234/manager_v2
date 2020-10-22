@@ -143,6 +143,7 @@ class AllRespository {
   }
 
   Future<List<String>> getUrlImageFromUrlChapter(String urlChapter) async {
+    printInfo(info:'Chay');
     var document = await getDocumentWeb(urlChapter);
     var chaptersDo = document.getElementsByClassName('page-chapter');
     List<String> urlImages = List<String>();

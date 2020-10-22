@@ -13,10 +13,12 @@ ChapterModel _$ChapterModelFromJson(Map<String, dynamic> json) {
     date: json['date'] as String,
     nameComic: json['nameComic'] as String,
     luotXem: json['luotXem'] as String,
-  )..pages = (json['pages'] as List)
-      ?.map((e) =>
-          e == null ? null : PageModel.fromJson(e as Map<String, dynamic>))
-      ?.toList();
+  )
+    ..isDownloaded = json['isDownloaded'] as bool
+    ..pages = (json['pages'] as List)
+        ?.map((e) =>
+            e == null ? null : PageModel.fromJson(e as Map<String, dynamic>))
+        ?.toList();
 }
 
 Map<String, dynamic> _$ChapterModelToJson(ChapterModel instance) =>
@@ -26,5 +28,6 @@ Map<String, dynamic> _$ChapterModelToJson(ChapterModel instance) =>
       'date': instance.date,
       'nameComic': instance.nameComic,
       'luotXem': instance.luotXem,
+      'isDownloaded': instance.isDownloaded,
       'pages': instance.pages,
     };

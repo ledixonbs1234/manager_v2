@@ -8,6 +8,7 @@ class ChapterModel {
   final String date;
   final String nameComic;
   final String luotXem;
+  bool isDownloaded = false;
   List<PageModel> pages;
 
   ChapterModel({this.name, this.url, this.date,this.nameComic,this.luotXem});

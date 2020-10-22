@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -86,8 +87,12 @@ class ChapterView extends GetView<ChapterController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+
+                    AutoSizeText(
                       controller.chapters[index].name,
+                      maxLines: 1,
+                      softWrap: true,
+                      minFontSize: 10,
                       style: GoogleFonts.roboto(color: Colors.blue),
                     ),
                     Text(controller.chapters[index].date)

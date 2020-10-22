@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:manager_v2/app/modules/chapter/chapter_controller.dart';
+import 'package:manager_v2/app/modules/comic/model/page_model.dart';
 import 'package:manager_v2/app/modules/read/read_controller.dart';
 
 class ReadView extends GetView<ReadController> {
@@ -14,19 +15,19 @@ class ReadView extends GetView<ReadController> {
           title: Text('ReadView'),
           centerTitle: true,
         ),
-        body: Obx(() =>
-        controller.pages.length == 0
+        body: Obx(() => !controller.isShow.value
             ? CircularProgressIndicator()
             : ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-            children: controller.pages.map((page) =>
-                _imageCell(page.urlRealpath)).toList()
-        )));
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: controller.pages
+                    .map((page) => _imageCell(page))
+                    .toList())));
   }
 
-  Widget _imageCell(String imageUrl) {
+  Widget _imageCell(PageModel imageUrl) {
     return ListTile(
-      title: Image.file(File(imageUrl)),
-    );
+        title: controller.isDownloaded.value
+            ? Image.file(File(imageUrl.urlRealpath))
+            : Image.network(imageUrl.urlPath,headers: {'referer':'nettruyen'},));
   }
 }

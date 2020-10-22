@@ -4,6 +4,7 @@ import 'package:manager_v2/app/modules/comic/model/comics_model.dart';
 import 'package:manager_v2/app/modules/searchcomic/searchcomic_controller.dart';
 import 'package:manager_v2/app/repository/all_respository.dart';
 import 'package:manager_v2/app/routes/app_pages.dart';
+import 'package:manager_v2/app/tool.dart';
 
 enum StateComic { None, Loading, Completed }
 
@@ -21,6 +22,7 @@ class ComicController extends GetxController {
 
     //thuc hien get truyen
     comicsFinded(await respository.getComicsFromJson());
+    Glob().setComicsFile(comicsFinded.value);
     if (comicsFinded == null) {}
   }
 

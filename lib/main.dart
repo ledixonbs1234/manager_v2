@@ -17,7 +17,7 @@ void main() {
   Get.lazyPut(() => SearchcomicController(respository: respository));
   Get.lazyPut(() => InfoController(respository: respository));
   Get.lazyPut(() => ChapterController(respository: respository));
-  Get.lazyPut(() => ReadController());
+  Get.lazyPut(() => ReadController(respository: respository));
 
   runApp(
     GetMaterialApp(
