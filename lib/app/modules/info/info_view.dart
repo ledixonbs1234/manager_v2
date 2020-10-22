@@ -48,17 +48,24 @@ class InfoView extends GetView<InfoController> {
                           SizedBox(
                             height: 80,
                           ),
-                          moduleRow(
-                            "Tac gia",
-                            controller.comic.value.tacgia,
-                            "Tinh trang",
-                            controller.comic.value.tinhTrang,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(width: 50,),
+                              moduleRow(
+                                "Tac gia",
+                                controller.comic.value.tacgia,
+                                "Tinh trang",
+                                controller.comic.value.tinhTrang,
+                              ),
+                              SizedBox(width: 50,),
+                              moduleRow(
+                                  "Luot xem",
+                                  controller.comic.value.luotXem,
+                                  "Name",
+                                  controller.comic.value.name),
+                            ],
                           ),
-                          SizedBox(
-                            height: 40,
-                          ),
-                          moduleRow("Luot xem", controller.comic.value.luotXem,
-                              "Name", controller.comic.value.name),
                           SizedBox(
                             height: 40,
                           ),
@@ -66,9 +73,9 @@ class InfoView extends GetView<InfoController> {
                               style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black)),
-                          SizedBox(height:10),
+                          SizedBox(height: 10),
                           Container(
-                            margin: EdgeInsets.all(10),
+                              margin: EdgeInsets.all(10),
                               width: Get.width,
                               child:
                                   Text('  ' + controller.comic.value.noidung)),
@@ -101,9 +108,11 @@ class InfoView extends GetView<InfoController> {
     );
   }
 
-  Row moduleRow(String title1, String result1, String title2, String result2) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+  Column moduleRow(
+      String title1, String result1, String title2, String result2) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [moduleInfo(title1, result1), moduleInfo(title2, result2)],
     );
   }
