@@ -28,6 +28,12 @@ class ReadView extends GetView<ReadController> {
     return ListTile(
         title: controller.isDownloaded.value
             ? Image.file(File(imageUrl.urlRealpath))
-            : Image.network(imageUrl.urlPath,headers: {'referer':'nettruyen'},));
+            : CachedNetworkImage(
+                imageUrl: imageUrl.urlPath,
+                httpHeaders: {'referer': 'nettruyen'},
+          progressIndicatorBuilder: (context, url, downloadProgress) =>
+              CircularProgressIndicator(value: downloadProgress.progress),
+          errorWidget: (context, url, error) => Icon(Icons.error),
+              ));
   }
 }

@@ -43,6 +43,7 @@ dependencies:
   get: 3.13.2
   path_provider: 1.6.18
   permission_handler: 5.0.1+1
+  transparent_image: ^1.0.0
   flutter:
     sdk: flutter
 
