@@ -18,11 +18,11 @@ class ReadController extends GetxController {
   final GlobalKey<FabCircularMenuState> fabkey = GlobalKey();
   ChapterController chapterC = Get.find<ChapterController>();
 
-  loadingPage(ChapterModel chapterDownload, bool isDownloaded) async {
+  loadingPage(ChapterModel chapterDownload ) async {
     chapter(chapterDownload);
-    this.isDownloaded(isDownloaded);
-    pages =List<PageModel>().obs;
-    if (isDownloaded) {
+    this.isDownloaded(chapter.value.isDownloaded);
+    pages.value.clear();
+    if (isDownloaded.value) {
       pages.value = chapterDownload.pages;
       isShow(true);
       pages.refresh();
@@ -40,19 +40,30 @@ class ReadController extends GetxController {
   }
 
   toNextPage() {
+
     //get next page Chapter()
     var chapters = chapterC.chapters;
     var index =
         chapters.indexWhere((element) => element.name == chapter.value.name);
-    var nextCount = index + 1;
-    loadingPage(chapters[nextCount], chapters[nextCount].isDownloaded);
+    if(index == 0)
+      {
+        Get.defaultDialog(content: Text('Da toi chapter cuoi'));
+        return;
+      }
+    var nextCount = index - 1;
+    loadingPage(chapters[nextCount]);
   }
 
   toPrevousPage() {
     var chapters = chapterC.chapters;
     var index =
         chapters.indexWhere((element) => element.name == chapter.value.name);
+    if(index == chapters.length -1 )
+    {
+      Get.defaultDialog(content: Text('Da toi chap dau tien'));
+      return;
+    }
     var preCountCount = index + 1;
-    loadingPage(chapters[preCountCount], chapters[preCountCount].isDownloaded);
+    loadingPage(chapters[preCountCount]);
   }
 }

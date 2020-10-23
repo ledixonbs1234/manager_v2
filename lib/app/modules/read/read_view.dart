@@ -37,7 +37,6 @@ class ReadView extends GetView<ReadController> {
                 }
               },
               alignment: Alignment.bottomLeft,
-              ringWidth: 80,
               fabColor: Colors.black12,
               key: controller.fabkey,
               ringColor: Colors.blue.withOpacity(0.5),
@@ -46,12 +45,17 @@ class ReadView extends GetView<ReadController> {
                     icon: FaIcon(
                       FontAwesomeIcons.arrowRight,
                       color: Colors.white,
-                    )),
+                    ),onPressed: (){
+                      controller.toNextPage();
+                      controller.isShowFLoat(false);
+
+                },),
                 IconButton(
                     icon:
                         FaIcon(FontAwesomeIcons.arrowLeft, color: Colors.white),
                     onPressed: () {
                       controller.toPrevousPage();
+                      controller.isShowFLoat(false);
                     }),
                 IconButton(
                     icon: FaIcon(FontAwesomeIcons.arrowCircleLeft,

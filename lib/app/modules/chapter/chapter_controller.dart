@@ -56,23 +56,21 @@ class ChapterController extends GetxController {
   }
 
   downloadChapter(int index) async {
-    chaptersView[index].isDownload(DownloadEnum.Downloading);
-    chaptersView[index].downloadCurrentValue = 0;
-    chaptersView.refresh();
+    //set chapter
+    prepareChapterViewToDownload(index);
     createComicFindIfNull();
-
     chapters[index].pages = List<PageModel>();
+
     int countPage = 0;
     //thuc hien download chapter trong nay
     await respository.downloadChapter(chapters[index],
         (PageModel value, int maxPage) {
+      //Call back khi download  hoan thanh toan bo
       if (value == null) {
         //xoa chapter download loi
-        chaptersView[index].isDownload(DownloadEnum.Error);
+        setChapterViewIfError(index);
         chapters[index].pages.clear();
-        chaptersView[index].downloadCurrentValue = 0;
-        chaptersView.refresh();
-        Get.defaultDialog(title: "${chaptersView[index].name} bi loi");
+       Get.defaultDialog(title: "${chaptersView[index].name} bi loi");
       } else {
         chapters[index].pages.add(value);
 
@@ -112,20 +110,10 @@ class ChapterController extends GetxController {
   }
 
   toReadPage(int index) {
-    bool isDownloaded = false;
-    if (chaptersView[index].isDownload.value == DownloadEnum.Completed) {
-      var indexCurrent = comicFinded.chapters
-          .indexWhere((element) => element.name == chaptersView[index].name);
-      isDownloaded = true;
-
-      currentChapter = comicFinded.chapters[indexCurrent];
-    } else {
-      isDownloaded = false;
-      currentChapter = chapters[index];
-    }
+    currentChapter = chapters[index];
 
     var readC = Get.find<ReadController>();
-    readC.loadingPage(currentChapter, isDownloaded);
+    readC.loadingPage(currentChapter);
     Get.toNamed(Routes.READ);
   }
 
@@ -169,5 +157,17 @@ class ChapterController extends GetxController {
       comicFinded.id = comicFinded.hashCode;
       comicFinded.chapters = List<ChapterModel>();
     }
+  }
+
+  void prepareChapterViewToDownload(int index) {
+    chaptersView[index].isDownload(DownloadEnum.Downloading);
+    chaptersView[index].downloadCurrentValue = 0;
+    chaptersView.refresh();
+  }
+
+  void setChapterViewIfError(int index) {
+    chaptersView[index].isDownload(DownloadEnum.Error);
+    chaptersView[index].downloadCurrentValue = 0;
+    chaptersView.refresh();
   }
 }
