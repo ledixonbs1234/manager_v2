@@ -46,16 +46,19 @@ class ReadView extends GetView<ReadController> {
                     icon: FaIcon(
                       FontAwesomeIcons.arrowRight,
                       color: Colors.white,
-                    ),
-                    onPressed: () {}),
+                    )),
                 IconButton(
                     icon:
                         FaIcon(FontAwesomeIcons.arrowLeft, color: Colors.white),
-                    onPressed: () {}),
+                    onPressed: () {
+                      controller.toPrevousPage();
+                    }),
                 IconButton(
                     icon: FaIcon(FontAwesomeIcons.arrowCircleLeft,
                         color: Colors.white),
-                    onPressed: () {})
+                    onPressed: () {
+                      Get.back();
+                    })
               ],
             ),
           ),

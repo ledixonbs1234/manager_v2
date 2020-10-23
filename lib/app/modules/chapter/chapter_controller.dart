@@ -43,7 +43,7 @@ class ChapterController extends GetxController {
     chapters = await respository.getChapterFromUrl(comicOnlyInfo.url);
     if  (comicFinded!= null)
       chapters = mapChaptersFileToChapters(chapters, comicFinded);
-    convertChaptersToChaptersView(comic.url);
+    convertChaptersToChaptersView();
   }
 
   ComicInfoModel getComicFromComicsFile() {
@@ -129,7 +129,7 @@ class ChapterController extends GetxController {
     Get.toNamed(Routes.READ);
   }
 
-  void convertChaptersToChaptersView(String url) async {
+  void convertChaptersToChaptersView() async {
     chaptersView.clear();
     for (var chapterv in chapters) {
       var chapterView = ChapterViewModel(name: chapterv.name);
@@ -148,7 +148,8 @@ class ChapterController extends GetxController {
         chapters[index] = chapter;
       }
     }
-    return chapters;
+    return chapters
+    ;
   }
 
   void createComicFindIfNull() {

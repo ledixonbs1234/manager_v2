@@ -1,6 +1,7 @@
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:manager_v2/app/modules/chapter/chapter_controller.dart';
 import 'package:manager_v2/app/modules/comic/model/chapter_model.dart';
 import 'package:manager_v2/app/modules/comic/model/page_model.dart';
 import 'package:manager_v2/app/repository/all_respository.dart';
@@ -15,14 +16,16 @@ class ReadController extends GetxController {
   var chapter = ChapterModel().obs;
   var isShowFLoat = false.obs;
   final GlobalKey<FabCircularMenuState> fabkey = GlobalKey();
+  ChapterController chapterC = Get.find<ChapterController>();
 
-  loadingPage(ChapterModel chapterDownload, bool isDownloaded)async {
+  loadingPage(ChapterModel chapterDownload, bool isDownloaded) async {
     chapter(chapterDownload);
     this.isDownloaded(isDownloaded);
     pages =List<PageModel>().obs;
     if (isDownloaded) {
       pages.value = chapterDownload.pages;
       isShow(true);
+      pages.refresh();
     } else {
       //thuc hien get page from resposity
       respository.getUrlImageFromUrlChapter(chapterDownload.url).then((value) {
@@ -31,7 +34,25 @@ class ReadController extends GetxController {
           pages.add(pageM);
         }
         isShow(true);
+        pages.refresh();
       });
     }
+  }
+
+  toNextPage() {
+    //get next page Chapter()
+    var chapters = chapterC.chapters;
+    var index =
+        chapters.indexWhere((element) => element.name == chapter.value.name);
+    var nextCount = index + 1;
+    loadingPage(chapters[nextCount], chapters[nextCount].isDownloaded);
+  }
+
+  toPrevousPage() {
+    var chapters = chapterC.chapters;
+    var index =
+        chapters.indexWhere((element) => element.name == chapter.value.name);
+    var preCountCount = index + 1;
+    loadingPage(chapters[preCountCount], chapters[preCountCount].isDownloaded);
   }
 }
